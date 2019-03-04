@@ -14,7 +14,7 @@ Options:
 
 """
 
-import sys
+import epics
 import yaml
 import numpy as np
 from dataclasses import dataclass
