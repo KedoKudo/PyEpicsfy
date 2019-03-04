@@ -1,0 +1,16 @@
+debug:
+  verbose: false
+
+scan:
+  omegaBegin: -180.0
+  omegaStop:  180.0
+  omegaStep:  1
+  exposureTime: 0.5
+  imagePrefix: 'scan'
+
+scan_advanced:
+  flatField:
+    nWhiteField: 10
+    nDarkField: 10
+  detector:
+    name: 
