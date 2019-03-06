@@ -10,7 +10,7 @@ startdb:
 # -- make uml diagram
 uml:
 	@echo "Making UML for devices module"
-	@pyreverse -Amy -o png -p apsdevices devices.py
+	@pyreverse -Amy -o pdf -p apsdevices devices.py
 	@echo
 
 # -- list all possible target in this makefile
