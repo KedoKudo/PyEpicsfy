@@ -1,5 +1,17 @@
 # ----- Project Targets ----- #
-.PHONY: list clean
+.PHONY: startdb uml list clean
+
+LOGSERER=${HOME}/data/db
+
+# -- start mongodb logger server
+startdb:
+	@mongod  --dbpath $(LOGSERER)
+
+# -- make uml diagram
+uml:
+	@echo "Making UML for devices module"
+	@pyreverse -Amy -o png -p apsdevices devices.py
+	@echo
 
 # -- list all possible target in this makefile
 list:
