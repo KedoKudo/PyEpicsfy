@@ -42,6 +42,8 @@ class TomoScan:
         
         with open(self.config_file) as f:
             self._config = yaml.safe_load(f)
+        
+        print(self._config)
 
     @log_event
     def start(self, monitor=False):
@@ -60,27 +62,17 @@ class TomoScan:
         # tomoscan_cleanup
         pass
 
-    def _check_beam(self):
-        # check if beam is present
-        _pv = f"{self._config['shutter']['PV']}:STA_A_FES_OPEN_PL"
-        _logged = False
-        while(epics.caget(_pv) == "OFF"):
-            if not _logged:
-                self._log(f"@{datetime.now()}, shutter is closed, waiting...")
-                _logged = True
-            time.sleep(60)
-        # log beam back on
-        self._log(f"@{datetime.now()}, shutter is reopened, continue scan...")
-
-    def _get_white(self):
-        pass
-
-    def _get_dark(self):
-        pass
-
-    def _log(self, msg):
-        # log all events
-        pass
+    # def _check_beam(self):
+    #     # check if beam is present
+    #     _pv = f"{self._config['shutter']['PV']}:STA_A_FES_OPEN_PL"
+    #     _logged = False
+    #     while(epics.caget(_pv) == "OFF"):
+    #         if not _logged:
+    #             self._log(f"@{datetime.now()}, shutter is closed, waiting...")
+    #             _logged = True
+    #         time.sleep(60)
+    #     # log beam back on
+    #     self._log(f"@{datetime.now()}, shutter is reopened, continue scan...")
 
 
 # ----- Start -----
@@ -94,4 +86,3 @@ if __name__ == "__main__":
                             dry_run=in_dryrun,
                             )
 
-    freescan_6bm.start()
