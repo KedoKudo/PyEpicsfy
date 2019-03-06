@@ -1,0 +1,63 @@
+# -- units
+# time   <- seconds
+# length <- mm
+# angle  <- degrees
+# -- naming
+#   Field names are used to communicate with 
+#   epics drivers, do not change them.
+
+# standard settings
+scan:
+  type: "freerun"
+  omegaBegin: -180.0
+  omegaStop:   180.0
+  omegaStep:     0.5
+  exposureTime: &exposuretime 0.5
+  imagePrefix: "scan"
+  frontWhiteFieldImages: 10
+  fwfPOS: -180
+  backWhiteFieldImages: 10
+  bwfPOS: -180
+  darkFieldImage: 10
+  dfPOS: -180
+
+# hardware configuration 
+# -- rarely need to change during projection
+hardware:
+  shutter:
+    devicePV: "PA:06BM"
+    status: "STA_A_FES_OPEN_PL"
+  detector:
+    devicePV: "1idPG2"
+    nFrames: &nframes 720
+    timeout: &timeout 3
+    cameras:
+      cam1:
+        devicePV: "cam1"
+        NumImages: *nframes
+        ImageMode: "Multiple"
+        TriggerMode: "Internal"
+        AcquireTime: *exposuretime
+        Gain: 5
+        timeout: *timeout
+    # images from camera are passed to 
+    # post-processing first
+    process:
+      proc1:
+        devicePV: "Proc1"
+        pvs:
+          EnableCallbacks: 1
+          EnableFilter: 1
+          NumFilter: *nframes
+          ResetFilter: 1
+          timeout: *timeout
+    # processed images then passed to io
+    # to save over the network (prefered)
+    io:
+      io1:
+        devicePV: "TIFF1"
+        pvs:
+          NDArrayPort: "PROC1"
+          FileWriteMode: "Stream"
+          AutoSave: "Yes"
+          timeout: *timeout
