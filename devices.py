@@ -144,6 +144,10 @@ class AreaDetector:
             plg.init()
 
 
+@dataclass
+class Motor:
+    devicePV: str
+
 
 if __name__ == "__main__":
     pass
