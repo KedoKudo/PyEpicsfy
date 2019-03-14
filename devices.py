@@ -92,6 +92,38 @@ class Camera:
 class Plugin:
     parentPV: str
     devicePV: str
+    timeout: float
+    pvs: dict
+
+    # note:
+    # Provided no modifications are made to the dictionary, 
+    # the order is maintained among iterations
+    def __post_init__(self):
+        self.__pv = f"{self.parentPV}:{self.devicePV}"
+        for key, val in self.pvs.items():
+            setattr(self, key, val)
+
+    @property
+    def pvlist(self):
+        return [f"{self.__pv}:{me}" for me, _ in self.pvs.items()]
+
+    @property
+    def pvvals(self):
+        return [me for _, me in self.pvs.items()]
+    
+    def init(self):
+        epics.caput_many(self.pvlist,
+                         self.pvvals,
+                         wait='all', put_timeout=self.timeout,
+                         )
+
+    @staticmethod
+    def from_config(parentpV, config_dict):
+        return Plugin(parentpV,
+                      config_dict['devicePV'],
+                      config_dict['timeout'],
+                      config_dict['pvs'],
+        )
 
 
 if __name__ == "__main__":
