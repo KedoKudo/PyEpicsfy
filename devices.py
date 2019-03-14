@@ -124,6 +124,25 @@ class Plugin:
                       config_dict['timeout'],
                       config_dict['pvs'],
         )
+@dataclass
+class AreaDetector:
+    devicePV: str
+    config_dict: str
+
+    def __post_init__(self):
+        self.cameras = [Camera.from_config(self.devicePV,cfg)
+                            for _, cfg in self.config_dict['cameras']
+                       ]
+        self.plugins = [Plugin.from_config(self.devicePV,cfg)
+                            for _, cfg in self.config_dict['plugins']
+                       ]
+    
+    def init(self):
+        for cam in self.cameras:
+            cam.init()
+        for plg in self.plugins:
+            plg.init()
+
 
 
 if __name__ == "__main__":
