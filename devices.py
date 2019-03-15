@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import epics
+import numpy as np
 from dataclasses import dataclass
+
 
 @dataclass
 class Shutter:
@@ -35,6 +37,7 @@ class Shutter:
                        config_dict['off'],
                       )
 
+
 @dataclass
 class Camera:
     parentPV: str
@@ -67,6 +70,17 @@ class Camera:
     @property
     def pvs(self):
         return dict(zip(self.pvlist, self.pvvals))
+
+    # poor man's way to deal with the inconsistent naming among
+    # different epics instruments/devices
+    @property
+    def nframes(self):
+        return epics.caget(f"{self.__pv}:NumImages.VAL")
+
+    @nframes.setter
+    def nframes(self, val):
+        epics.caput(f"{self.__pv}:NumImages", val, 
+                    wait=True, timeout=self.timeout)
     
     def init(self):
         epics.caput_many(self.pvlist, 
@@ -117,6 +131,34 @@ class Plugin:
                          wait='all', put_timeout=self.timeout,
                          )
 
+    @property
+    def nframes(self):
+        """read nframes from device"""
+        # not an elegent way to handle the inconsistent naming,
+        # but it should work
+        if self.pvs.has_key("NumFilter"):
+            _pv = f"{self.__pv}:NumFilter"
+        elif self.pvs.has_key("NumCapture"):
+            _pv = f"{self.__pv}:NumCapture"
+        else:
+            raise AttributeError("Cannot find nframes entry")
+        
+        return epics.caget(f"{_pv}.VAL")
+    
+    @nframes.setter
+    def nframes(self, val):
+        """set nframes to plugin"""
+        if self.pvs.has_key("NumFilter"):
+            _pv = f"{self.__pv}:NumFilter"
+        elif self.pvs.has_key("NumCapture"):
+            _pv = f"{self.__pv}:NumCapture"
+        else:
+            raise AttributeError("Cannot find nframes entry")
+        # now send the value to epics
+        epics.caput(_pv, val,
+                    wait=True, timeout=self.timeout
+                   )
+
     @staticmethod
     def from_config(parentpV, config_dict):
         return Plugin(parentpV,
@@ -124,8 +166,22 @@ class Plugin:
                       config_dict['timeout'],
                       config_dict['pvs'],
         )
+
+
 @dataclass
 class AreaDetector:
+    """
+    This class was intended as an abstraction for all area detectors
+    used at APS.  However, due to the inconsistent naming scheme
+        ***
+        for instance, the same concept "number of frames" are named as
+        "NumImages" in the camera ca, "NumFilter" in the procesing plugins,
+        and "NumCapture" in the file io plugin.
+        ***
+    it is difficult to make it work for all cases.  So a workaround
+    would be use this one as a base class and reimplement the getter and
+    setter.
+    """
     devicePV: str
     config_dict: str
 
@@ -138,10 +194,35 @@ class AreaDetector:
                        ]
     
     def init(self):
+        """ Initialize all cameras and plugins."""
         for cam in self.cameras:
             cam.init()
         for plg in self.plugins:
             plg.init()
+
+    @property
+    def nframes(self):
+        _nframes = [cam.nframes for cam in self.cameras]
+        _nframes += [plugin.nframes for plugin in self.plugins]
+        
+        if AreaDetector._is_uniform(_nframes):
+            return np.average(_nframes).astyep(np.int)
+        else:
+            raise ValueError("Inconsistent nframes in detector settings")
+
+    @nframes.setter
+    def nframes(self, val):
+        """set nframes to all cameras and plugins"""
+        for cam in self.cameras:
+            cam.nframes = val
+        for plugin in self.plugins:
+            plugin.nframes = val
+
+    @staticmethod
+    def _is_uniform(ndarray, tol=1e-4):
+        ndarray = np.array(ndarray)
+        delta = np.absolute(np.average(ndarray - ndarray.mean))
+        return delta < tol
 
 
 @dataclass

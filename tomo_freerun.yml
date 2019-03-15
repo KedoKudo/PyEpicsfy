@@ -29,6 +29,9 @@ hardware:
     status: "STA_A_FES_OPEN_PL"
   areaDetector:
     devicePV: "1idPG2"
+    # nframes and timeout are usually configured on-the-fly as different scan
+    # often requires different number of images collected. Think of the values
+    # here are just place holders.
     nFrames: &nframes 720
     timeout: &timeout 3
     cameras:
@@ -58,6 +61,7 @@ hardware:
           NDArrayPort: "PROC1"
           FileWriteMode: "Stream"
           AutoSave: "Yes"
+          NumCapture: *nframes
   motors:
     sampleX:
       devicePV: 'ppp'
