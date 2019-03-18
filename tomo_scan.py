@@ -28,9 +28,6 @@ from utility import log_event
 
 @dataclass
 class TomoScan:
-    """
-    scan plan for tomogarphy scan
-    """
     config_file: str
     verbose: bool = True
     dry_run: bool = False
