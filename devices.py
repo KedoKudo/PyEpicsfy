@@ -9,8 +9,6 @@ from dataclasses import dataclass
 class Shutter:
     devicePV: str
     status: str
-    on: str
-    off: str
 
     @property
     def is_open(self):
@@ -31,11 +29,10 @@ class Shutter:
 
     @staticmethod
     def from_config(config_dict):
-        return Shutter(config_dict['devicePV'],
-                       config_dict['status'],
-                       config_dict['on'],
-                       config_dict['off'],
-                      )
+        return Shutter(
+            config_dict['devicePV'],
+            config_dict['status'],
+        )
 
 
 @dataclass
@@ -87,6 +84,9 @@ class Camera:
                          self.pvvals, 
                          wait='all', put_timeout=self.timeout,
                          )
+
+    def acquire_image(self):
+        """Ask the camera to capture the image"""
     
     @staticmethod
     def from_config(parentPV, config_dict):
@@ -99,7 +99,7 @@ class Camera:
             config_dict['AcquireTime'],
             config_dict['gain'],
             config_dict['timeout'],
-            )
+        )
 
 
 @dataclass
@@ -161,10 +161,11 @@ class Plugin:
 
     @staticmethod
     def from_config(parentpV, config_dict):
-        return Plugin(parentpV,
-                      config_dict['devicePV'],
-                      config_dict['timeout'],
-                      config_dict['pvs'],
+        return Plugin(
+            parentpV,
+            config_dict['devicePV'],
+            config_dict['timeout'],
+            config_dict['pvs'],
         )
 
 
@@ -223,6 +224,14 @@ class AreaDetector:
         ndarray = np.array(ndarray)
         delta = np.absolute(np.average(ndarray - ndarray.mean))
         return delta < tol
+
+    @staticmethod
+    def from_config(config_dict):
+        """Construct area detector from configuration dict"""
+        return AreaDetector(
+            config_dict['devicePV'],
+            config_dict,
+        )
 
 
 @dataclass
