@@ -1,7 +1,11 @@
 # ----- Project Targets ----- #
-.PHONY: startdb uml list clean
+.PHONY: test startdb uml list clean
 
 LOGSERER=${HOME}/data/db
+
+# -- test
+test:
+	python tomo_6bm.py -d devices.yml scan.yml
 
 # -- start mongodb logger server
 startdb:
