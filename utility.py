@@ -12,10 +12,17 @@ Options:
 --version           Show version
 """
 
+import yaml
 from functools import wraps
 from datetime  import datetime
 from docopt import docopt
 from pymongo import MongoClient
+
+def load_config(conf_f):
+    """Read configuration to dict"""
+    with open(conf_f, 'r') as f:
+        conf_dict = yaml.safe_load(f)
+    return conf_dict
 
 def log_event(func, port=27017):
     def log_event_(*args, **kwds):
