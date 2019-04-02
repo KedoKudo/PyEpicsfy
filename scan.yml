@@ -1,0 +1,15 @@
+# standard settings
+scan:
+  type: "freerun"
+  omegaBegin: -180.0
+  omegaStop:   180.0
+  omegaStep:     0.5
+  exposureTime: &exposuretime 0.5
+  imagePrefix: "scan"
+  frontWhiteFieldImages: 10
+  fwfPOS: -180
+  backWhiteFieldImages: 10
+  bwfPOS: -180
+  darkFieldImage: 10
+  dfPOS: -180
+  imgDir: "/tmp/test_run_6bm"
