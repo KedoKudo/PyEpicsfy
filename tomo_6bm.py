@@ -62,9 +62,12 @@ if __name__ == "__main__":
     # Initialize all devices with given configurations
     devices = init_devices(load_config(args['<DEVICES>']))
     scans = init_scan(load_config(args['<SCAN>']))
+    
+    if in_dryrun:
+        print(devices)
 
     # Collect flat/white field images
-    
+
 
     # Collect projections (step motion)
 

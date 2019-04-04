@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import epics
+import warnings
 import numpy as np
 from dataclasses import dataclass
 
@@ -9,6 +10,8 @@ from dataclasses import dataclass
 class Shutter:
     devicePV: str
     status: str
+    openstr: str
+    closestr: str
 
     @property
     def is_open(self):
@@ -21,17 +24,27 @@ class Shutter:
     def check_status(self):
         return epics.caget(f"{self.devicePV}:{self.status}")
 
+    @property
     def open(self):
-        raise NotImplementedError
+        if self.is_closed:
+            epics.caput(f"{self.devicePV}:{self.openstr}", 1, 0)
+        else:
+            warnings.warn("shutter is already open", RuntimeWarning)
 
+    @property
     def close(self):
-        raise NotImplementedError
+        if self.is_open:
+            epics.caput(f"{self.devicePV}:{self.closestr}", 1, 0)
+        else:
+            warnings.warn("shutter is already closed", RuntimeWarning)
 
     @staticmethod
     def from_config(config_dict):
         return Shutter(
             config_dict['devicePV'],
             config_dict['status'],
+            config_dict['open'],
+            config_dict['close'],
         )
 
 
@@ -97,7 +110,7 @@ class Camera:
             config_dict['ImageMode'],
             config_dict['TriggerMode'],
             config_dict['AcquireTime'],
-            config_dict['gain'],
+            config_dict['Gain'],
             config_dict['timeout'],
         )
 
@@ -188,10 +201,10 @@ class AreaDetector:
 
     def __post_init__(self):
         self.cameras = [Camera.from_config(self.devicePV,cfg)
-                            for _, cfg in self.config_dict['cameras']
+                            for _, cfg in self.config_dict['cameras'].items()
                        ]
         self.plugins = [Plugin.from_config(self.devicePV,cfg)
-                            for _, cfg in self.config_dict['plugins']
+                            for _, cfg in self.config_dict['plugins'].items()
                        ]
     
     def init(self):
