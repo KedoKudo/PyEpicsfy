@@ -16,6 +16,7 @@ shutter:
 
 # point gray detector
 areadetector:
+  name: "grasshopper"
   pvs: 
     - "1idPG2:cam1:NumImages"            #~w <n_imgs>
     - "1idPG2:cam1:ImageMode"            #~w ["Multiple","Single","Continuous"]
@@ -62,10 +63,13 @@ areadetector:
     - "1idPG2:image1:"
     - "1idPG2:Trans1:EnableCallbacks"    #~w ["Disable"|0,"Enable"|1]                                                  $$  epics_put(sprintf("%sEnableCallbacks", ADTRANSPV), "Disable", timeout)
     - "1idPG2:Trans1:"
-    - "6bmXMAP:Acquiring"                #~r ["Done"]                          //CHECK IF DATA COLLECTION COMPLETE     $$ det_status=epics_get("6bmXMAP:Acquiring")
-    - "6bmXMAP:DeadTime"                 #~r                                   //mca scan                              $$ _dt=epics_get("6bmXMAP:DeadTime")
-    - "6bmXMAP:mca1.IDTIM"               #~r                                                                           $$ _dt1=epics_get("6bmXMAP:mca1.IDTIM")
-    - "6bmXMAP:mca2.IDTIM"               #~r                                                                           $$ _dt2=epics_get("6bmXMAP:mca2.IDTIM")
+
+# MCA:
+#   pvs:
+#     - "6bmXMAP:Acquiring"                #~r ["Done"]                          //CHECK IF DATA COLLECTION COMPLETE     $$ det_status=epics_get("6bmXMAP:Acquiring")
+#     - "6bmXMAP:DeadTime"                 #~r                                   //mca scan                              $$ _dt=epics_get("6bmXMAP:DeadTime")
+#     - "6bmXMAP:mca1.IDTIM"               #~r                                                                           $$ _dt1=epics_get("6bmXMAP:mca1.IDTIM")
+#     - "6bmXMAP:mca2.IDTIM"               #~r                                                                           $$ _dt2=epics_get("6bmXMAP:mca2.IDTIM")
 
 # motors PVs are not included in the macro
 # important build-in function vars in current epics macros
@@ -76,7 +80,7 @@ areadetector:
 # - wait_move
 motors:
   pvs:
-    - "6bma1:allstop.VAL"                #~w 1                                 //Stop all motos at 6bm                 $$ epics_put("6bma1:allstop.VAL", 1)
+    # - "6bma1:allstop.VAL"                #~w 1                                 //Stop all motos at 6bm                 $$ epics_put("6bma1:allstop.VAL", 1)
     - "6bmpreci:eFly:encoderOrStep"      #~w [0:encoder   1:motor step]
     - "6bmpreci:eFly:autoReverse"        #~w [0:No        1:Yes]
     - "6bmpreci:eFly:scanControl"        #~w [0:Standard  1:Custom]
@@ -102,17 +106,16 @@ mystries:
     - "6bma1:m18.RBV"                    #~r                                   //mv_yr@utilities.mac                   $$ _nowY=epics_get("6bma1:m18.RBV")
     - "6bma1:Keyence:1:ch1.VAL"          #~r                                   //mv_yr@utilities.mac                   $$ _keyence=epics_get("6bma1:Keyence:1:ch1.VAL")
     - "6bma1:userCalc2.VAL"              #~r                                   //mv_yr@utilities.mac                   $$ _diffY=fabs(epics_get("6bma1:userCalc2.VAL"))
-    - "6bma1:A%dsens_num.VAL"            #~rw [0~8]                            //SetPreampSens@preamp.mac              $$ epics_put(sprintf("6bma1:A%dsens_num.VAL", s), 0, 10)
-    - "6bma1:A%dsens_unit.VAL"           #~rw ["pA","nA","uA","mA"]            //SetPreampOffsetUnit@preamp.mac        $$ epics_put(sprintf("6bma1:A%doffset_unit.VAL", s), "pA", 10)
-    - "6bma1:A%doffset_num.VAL"          #~rw [0~8]                            //SetPreampOffset@premap.mac            $$ epics_put(sprintf("6bma1:A%doffset_num.VAL", s), 0, 10)
-    - "6bma1:A%doffset_unit.VAL"         #~rw                                  //GetPreampOffsetUnit@premap.mac        $$ preamp=epics_get(sprintf("6bma1:A%doffset_unit.VAL", s))
-    - "6bma1:A%doff_u_put.VAL"           #~rw                                  //GetPreampOffsetVal@preamp.mac         $$ preamp=epics_get(sprintf("6bma1:A%doff_u_put.VAL", s))
-    - "6bma1:A%dinit.PROC"               #~rw                                  //SetPreampSettings@premap.mac          $$ epics_put(sprintf("6bma1:A%dinit.PROC", $1), 1, CB_TIME)   
-    - "6bma2:userStringCalc8.AA"         #~r                                   //motor_cam_sweep@mca_scan.mac          $$ file_name=epics_get("6bma2:userStringCalc8.AA")
-    - "6bma2:userStringCalc8.BB"         #~r                                   //motor_cam_sweep@mca_scan.mac          $$ path_name=epics_get("6bma2:userStringCalc8.BB")
-    - "6bma1:GTIM_TIME"                  #~r                                   //get_beamline_parameters@mca_scan.mac  $$ epoch_time=sprintf("%15.8f", epics_get("6bma1:GTIM_TIME", "double"))
-    - "6bma2:scaler1.T"                  #~r                                   //get_beamline_parameters@mca_scan.mac  $$ elapsed_time=epics_get("6bma2:scaler1.T")
-    - "S35DCCT:currentCC"                #~r                                   //get_beamline_parameters@mca_scan.mac  $$ Iring=epics_get("S35DCCT:currentCC")
+    # - "6bma1:A%dsens_num.VAL"            #~rw [0~8]                            //SetPreampSens@preamp.mac              $$ epics_put(sprintf("6bma1:A%dsens_num.VAL", s), 0, 10)
+    # - "6bma1:A%dsens_unit.VAL"           #~rw ["pA","nA","uA","mA"]            //SetPreampOffsetUnit@preamp.mac        $$ epics_put(sprintf("6bma1:A%doffset_unit.VAL", s), "pA", 10)
+    # - "6bma1:A%doffset_num.VAL"          #~rw [0~8]                            //SetPreampOffset@premap.mac            $$ epics_put(sprintf("6bma1:A%doffset_num.VAL", s), 0, 10)
+    # - "6bma1:A%doffset_unit.VAL"         #~rw                                  //GetPreampOffsetUnit@premap.mac        $$ preamp=epics_get(sprintf("6bma1:A%doffset_unit.VAL", s))
+    # - "6bma1:A%doff_u_put.VAL"           #~rw                                  //GetPreampOffsetVal@preamp.mac         $$ preamp=epics_get(sprintf("6bma1:A%doff_u_put.VAL", s))
+    # - "6bma1:A%dinit.PROC"               #~rw                                  //SetPreampSettings@premap.mac          $$ epics_put(sprintf("6bma1:A%dinit.PROC", $1), 1, CB_TIME)   
+    # - "6bma2:userStringCalc8.AA"         #~r                                   //motor_cam_sweep@mca_scan.mac          $$ file_name=epics_get("6bma2:userStringCalc8.AA")
+    # - "6bma2:userStringCalc8.BB"         #~r                                   //motor_cam_sweep@mca_scan.mac          $$ path_name=epics_get("6bma2:userStringCalc8.BB")
+    # - "6bma1:GTIM_TIME"                  #~r                                   //get_beamline_parameters@mca_scan.mac  $$ epoch_time=sprintf("%15.8f", epics_get("6bma1:GTIM_TIME", "double"))
+    # - "6bma2:scaler1.T"                  #~r                                   //get_beamline_parameters@mca_scan.mac  $$ elapsed_time=epics_get("6bma2:scaler1.T")
     - "6bma1:m19.RBV"                    #~r                                   //get_beamline_parameters@mca_scan.mac  $$ samX=epics_get("6bma1:m19.RBV")
     - "6bma1:m18.RBV"                    #~r                                   //get_beamline_parameters@mca_scan.mac  $$ samY=epics_get("6bma1:m18.RBV")
     - "6bma1:m17.RBV"                    #~r                                   //get_beamline_parameters@mca_scan.mac  $$ samZ=epics_get("6bma1:m17.RBV")
