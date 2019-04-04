@@ -11,7 +11,9 @@
 # -- rarely need to change during projection
 shutter:
   devicePV: "PA:06BM"
-  status: "STA_A_FES_OPEN_PL"
+  status:   "STA_A_FES_OPEN_PL"
+  open:     "rShtrA:Open.VAL"
+  close:    "rShtrA:Close.VAL"
 
 areaDetector:
   devicePV: "1idPG2"
