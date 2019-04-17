@@ -32,6 +32,23 @@ Then install `jupyter` and `matplotlib` with
 conda install jupyter matplotlib
 ```
 
+For update BlueSky packages, one can always do update with explicit channel name  
+```
+conda update bluesky -c lightsource2-tag
+```
+
+Alternatively, a package configuration file `.condarc` can be placed under `CONDA_INSTALL_DIR/envs/ENV_NAME/` with the following content  
+```YAML  
+channels:
+    - lightsource2-tag  
+    - lightsource2-dev  
+    - aps-anl-tag  
+    - aps-anl-dev  
+    - prjemian  
+    - defaults  
+    - conda-forge
+```
+
 > NOTE   
 > This is the recommended way to install BlueSky and associated dependencies.
 
