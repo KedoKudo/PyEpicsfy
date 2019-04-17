@@ -21,7 +21,7 @@ followed by installing apstools
 conda install apstools -c aps-anl-dev
 ```
 
-Before installing the metapackage `jupyter`, it is recommended to pin the package `tornado` to an older version until BlueSky dev team solve the related runtime errors (https://github.com/NSLS-II/bluesky/issues/1062).
+Before installing the metapackage `jupyter`, it is recommended to pin the package `tornado` to an older version until BlueSky dev team solve the related [issue#1062](https://github.com/NSLS-II/bluesky/issues/1062).
 To do so, create a file named __pinned__ under the directory `$CONDA_INSTALL_DIR/env/ENVNAME/conda-meta` with the following content:  
 ```
 tornado<5
@@ -52,6 +52,30 @@ channels:
 > NOTE   
 > This is the recommended way to install BlueSky and associated dependencies.
 
+### Install with _pip_
+
+Install bluesky and apstools with pip
+```
+pip install -U pip
+pip install boltons mongoquery pims pyepics pyRestTable tzlocal jupyter suitcase matplotlib
+pip install git+https://github.com/Nikea/historydict#egg=historydict \
+            git+https://github.com/NSLS-II/amostra#egg=amostra \
+            git+https://github.com/NSLS-II/bluesky#egg=bluesky \
+            git+https://github.com/NSLS-II/databroker#egg=databroker \
+            git+https://github.com/NSLS-II/doct#egg=doct \
+            git+https://github.com/NSLS-II/event-model#egg=event_model \
+            git+https://github.com/NSLS-II/ophyd#egg=ophyd \
+            git+https://github.com/NSLS-II/hklpy#egg=hklpy
+pip install apstools
+```
+
+Similarly, the package `tornado` need to be downgrade below 5.0 to avoid the runtime error.
+
+## Config Meta-data handler (MongoDB)
+
+Copy the configuration file `configs/mongodb_config.yml ` to `mongodb_config.yml` to enable meta-data handler backed by a MongoDB server.
+
+> The entry __host__ need to be changed to the IP of the machine that hosts the MongoDB service.
 
 ## Ipython based control
 
