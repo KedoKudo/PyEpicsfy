@@ -45,7 +45,7 @@ For update BlueSky packages, one can always do update with explicit channel name
 conda update bluesky -c lightsource2-tag
 ```
 
-Alternatively, a package configuration file `.condarc` can be placed under `HOME` with the following content
+Alternatively, a package configuration file `.condarc` can be placed under `HOME` (single env) or `CONDA_INSTALL_DIR/envs/ENV_NAME` (multi-env) with the following content
  
 ```YAML  
 channels:
