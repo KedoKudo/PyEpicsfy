@@ -22,7 +22,7 @@ conda install apstools -c aps-anl-dev
 ```
 
 Before installing the metapackage `jupyter`, it is recommended to pin the package `tornado` to an older version until BlueSky dev team solve the related [issue#1062](https://github.com/NSLS-II/bluesky/issues/1062).
-To do so, create a file named __pinned__ under the directory `$CONDA_INSTALL_DIR/env/ENVNAME/conda-meta` with the following content:  
+To do so, create a file named __pinned__ under the directory `CONDA_INSTALL_DIR/env/ENVNAME/conda-meta` with the following content:  
 ```
 tornado<5
 ```
