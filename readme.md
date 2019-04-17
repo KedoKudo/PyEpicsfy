@@ -1,4 +1,4 @@
-# BlueSky Control for 6BM@APS
+# BlueSky Control for 6BM-A@APS
 
 This repository is a development process for deploying BlueSky based control system for tomography characterization at 6BM@APS.
 
@@ -6,38 +6,47 @@ This repository is a development process for deploying BlueSky based control sys
 
 ### Install with _conda_
 
-Install bluesky core packages first  
+Install bluesky core packages first
+
+> As of 04/17/2019, python3.6 is the prefered version for running BlueSky.
+
 ```
 conda install bluesky -c lightsource2-tag
 ```
 
-then the apstools dependencies  
+then the apstools dependencies
+
 ```
 conda install pyresttable -c prjemian
 ```
 
-followed by installing apstools  
+followed by installing apstools
+
 ```
 conda install apstools -c aps-anl-dev
 ```
 
 Before installing the metapackage `jupyter`, it is recommended to pin the package `tornado` to an older version until BlueSky dev team solve the related [issue#1062](https://github.com/NSLS-II/bluesky/issues/1062).
-To do so, create a file named __pinned__ under the directory `CONDA_INSTALL_DIR/env/ENVNAME/conda-meta` with the following content:  
+To do so, create a file named __pinned__ under the directory `CONDA_INSTALL_DIR/env/ENVNAME/conda-meta` with the following content:
+
 ```
 tornado<5
 ```
 
-Then install `jupyter` and `matplotlib` with  
+Then install `jupyter` and `matplotlib` with
+ 
 ```
 conda install jupyter matplotlib
 ```
 
-For update BlueSky packages, one can always do update with explicit channel name  
+For update BlueSky packages, one can always do update with explicit channel name
+
 ```
 conda update bluesky -c lightsource2-tag
 ```
 
-Alternatively, a package configuration file `.condarc` can be placed under `CONDA_INSTALL_DIR/envs/ENV_NAME/` with the following content  
+Alternatively, a package configuration file `.condarc` can be placed under `HOME` with the following content
+ 
 ```YAML  
 channels:
     - lightsource2-tag  
@@ -55,6 +64,7 @@ channels:
 ### Install with _pip_
 
 Install bluesky and apstools with pip
+
 ```
 pip install -U pip
 pip install boltons mongoquery pims pyepics pyRestTable tzlocal jupyter suitcase matplotlib
