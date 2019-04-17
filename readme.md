@@ -93,3 +93,10 @@ Copy the configuration file `configs/mongodb_config.yml ` to `HOME/.config/datab
 
 The environment var `IPYTHONDIR` needs to be set where the profile folder is, or simply create symbolic link of the deisred profile to `~/.ipython/`, which is the default location to store all IPython profiles.
 
+### Startup
+Issue the following command in the terminal to run IPython with pre-configured environment for Tomo-characterization at 6-BM-A:
+
+```
+>> ipython --profile=6bma
+```
+
