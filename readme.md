@@ -73,7 +73,7 @@ Similarly, the package `tornado` need to be downgrade below 5.0 to avoid the run
 
 ## Config Meta-data handler (MongoDB)
 
-Copy the configuration file `configs/mongodb_config.yml ` to `mongodb_config.yml` to enable meta-data handler backed by a MongoDB server.
+Copy the configuration file `configs/mongodb_config.yml ` to `HOME/.config/databroker/mongodb_config.yml` to enable meta-data handler backed by a MongoDB server.
 
 > The entry __host__ need to be changed to the IP of the machine that hosts the MongoDB service.
 
