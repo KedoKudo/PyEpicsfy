@@ -19,18 +19,7 @@ def collect_background(n_images,
     """collect n_images backgrounds with n_frames per take"""
     yield from bps.mv(det.cam.acquire, 0)
 
-    if output.lower() in ['tif', 'tiff']:
-        for k,v in {
-            "num_capture": n_images,
-            "capture":     1,
-        }.items(): det.tiff1.stage_sigs[k] = v
-    elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
-        for k,v in {
-            "num_capture": n_images,
-            "capture":     1,
-        }.items(): det.hdf1.stage_sigs[k] = v
-    else:
-        raise ValueError(f"Unknown output format {output}")
+    set_output_type(output)
     
     for k,v in {
         "reset_filter":     1,
@@ -59,18 +48,7 @@ def step_scan(n_images,
               output='tiff',
     ):
     """collect proejctions by stepping motors"""
-    if output.lower() in ['tif', 'tiff']:
-        for k,v in {
-            "num_capture": n_images,
-            "capture":     1,
-        }.items(): det.tiff1.stage_sigs[k] = v
-    elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
-        for k,v in {
-            "num_capture": n_images,
-            "capture":     1,
-        }.items(): det.hdf1.stage_sigs[k] = v
-    else:
-        raise ValueError(f"Unknown output format {output}")
+    set_output_type(output)
 
     for k, v in {
         "enable":           1,         # toggle on proc1

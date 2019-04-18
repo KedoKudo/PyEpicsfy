@@ -143,6 +143,7 @@ config_proc1 = {
 }
 
 config_tiff1 = {
+    "enable",           0,            # disable by default
     "nd_array_port":    "PROC1",      # switch port for TIFF plugin
     "file_write_mode":  "Stream",     # change write mode
     "auto_save":        "Yes",        # turn on file save
@@ -151,8 +152,11 @@ config_tiff1 = {
 }
 
 config_hdf1 = {
-    "enable":    0,
-    "auto_save": "Yes",
+    "enable":          0,           # disable by default
+    "nd_array_port":  "PROC1",      # switch port for TIFF plugin
+    "auto_save":      "Yes",
+    "file_path":      FILE_PATH,    # set file path
+    "file_name":      FILE_PREFIX,  # img name prefix
 }
 
 if offline_testmode:
@@ -161,7 +165,7 @@ if offline_testmode:
 else:
     det = PointGreyDetector6BM(f"{ADPV_prefix}:", name='det')
 
-    det.read_attrs.append('tiff1')  # this is very important
+    # det.read_attrs.append('tiff1')  # this is very important
     # use det.read_attrs[-1] = 'hdf1' to switch to HDF5 output
     
     # catch timeout error in case detector not responding
@@ -181,5 +185,34 @@ else:
     print("***--- config_tiff1")
     print("***--- config_hdf1")
     print("***before the acutal scan")
+
+
+def set_output_type(output='tiff'):
+    """config output"""
+    # clear the watch list first
+    # NOTE:
+    #    det.read_attrs is treated as a gloal var, therefore the chnages
+    #    made here affect the global workspace
+    det.read_attrs = [me for me in det.read_attrs 
+                        if me not in ('tiff1', 'hdf1')
+                    ]
+    if output.lower() in ['tif', 'tiff']:
+        for k,v in {
+            "enable":      1,
+            "num_capture": n_images,
+            "capture":     1,
+        }.items(): det.tiff1.stage_sigs[k] = v
+        det.hdf1.stage_sigs["enable"] = 0
+        det.read_attrs.append('tiff1')
+    elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
+        for k,v in {
+            "enable":      1,
+            "num_capture": n_images,
+            "capture":     1,
+        }.items(): det.hdf1.stage_sigs[k] = v
+        det.tiff1.stage_sigs["enable"] = 0
+        det.read_attrs.append('hdf1')
+    else:
+        raise ValueError(f"Unknown output format {output}")
 
 print(f"Done with {__file__}\n{_sep}\n")
