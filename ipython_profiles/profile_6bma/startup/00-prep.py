@@ -1,5 +1,6 @@
 # Setup script for using BlueSky at 6-BM-A
-print(f'Initializing IPython environment using {__file__}')
+_sep = u"🙈"*30
+print(f'{_sep}\nInitializing IPython environment using {__file__}\n')
 
 # -----
 print('\nConfig the meta-data handler...\n')
@@ -60,12 +61,14 @@ calcs = apstools.synApps_ophyd.userCalcsDevice("6bma1:", name="calcs", )
 hutch_light_on = lambda : bool(calcs.calc1.val.get())
 
 # conducting experiment mode
-try:
+if offline_testmode:
+    in_production = False
+else:
     in_production = aps.inUserOperations \
                 and (instrument_in_use.get() in (1, "6-BM-A")) \
                 and (not hutch_light_on)
-except:
-    in_production = False
 
 # testing mode, supercede in_production
 in_dryrun = True
+
+print(f"Done with {__file__}\n{_sep}\n")
