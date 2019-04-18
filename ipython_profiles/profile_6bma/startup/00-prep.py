@@ -2,12 +2,12 @@
 print(f'Initializing IPython environment using {__file__}')
 
 # -----
-print('Config the meta-data handler...\n')
+print('\nConfig the meta-data handler...\n')
 from databroker import Broker
 db = Broker.named("mongodb_config")
 
 # -----
-print('Create RunEngine RE')
+print('\nCreate RunEngine RE')
 import bluesky
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
@@ -51,18 +51,21 @@ except TimeoutError as e:
     RE.md['INSTRUMENT_IN_USE'] = False
 finally:
     from pprint import pprint
-    print("Current registered metadata:")
+    print("\nCurrent registered metadata:")
     pprint(RE.md)
-    print("Update entries in RE.md if necessary")
+    print("***Update entries in RE.md if necessary")
 
 import apstools.synApps_ophyd
 calcs = apstools.synApps_ophyd.userCalcsDevice("6bma1:", name="calcs", )
 hutch_light_on = lambda : bool(calcs.calc1.val.get())
 
 # conducting experiment mode
-in_production = aps.inUserOperations \
-            and (instrument_in_use.get() in (1, "6-BM-A")) \
-            and (not hutch_light_on)
+try:
+    in_production = aps.inUserOperations \
+                and (instrument_in_use.get() in (1, "6-BM-A")) \
+                and (not hutch_light_on)
+except:
+    in_production = False
 
 # testing mode, supercede in_production
 in_dryrun = True
