@@ -8,6 +8,35 @@ import bluesky.preprocessors as bpp
 import bluesky.plan_stubs    as bps
 
 
+def set_output_type(n_images, output='tiff'):
+    """config output"""
+    # clear the watch list first
+    # NOTE:
+    #    det.read_attrs is treated as a gloal var, therefore the chnages
+    #    made here affect the global workspace
+    det.read_attrs = [me for me in det.read_attrs 
+                        if me not in ('tiff1', 'hdf1')
+                    ]
+    if output.lower() in ['tif', 'tiff']:
+        for k,v in {
+            "enable":      1,
+            "num_capture": n_images,
+            "capture":     1,
+        }.items(): det.tiff1.stage_sigs[k] = v
+        det.hdf1.stage_sigs["enable"] = 0
+        det.read_attrs.append('tiff1')
+    elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
+        for k,v in {
+            "enable":      1,
+            "num_capture": n_images,
+            "capture":     1,
+        }.items(): det.hdf1.stage_sigs[k] = v
+        det.tiff1.stage_sigs["enable"] = 0
+        det.read_attrs.append('hdf1')
+    else:
+        raise ValueError(f"Unknown output format {output}")
+
+
 # ----
 # Dark/White flat field
 # NOTE:
@@ -19,7 +48,7 @@ def collect_background(n_images,
     """collect n_images backgrounds with n_frames per take"""
     yield from bps.mv(det.cam.acquire, 0)
 
-    set_output_type(output)
+    set_output_type(n_images, output)
     
     for k,v in {
         "reset_filter":     1,
@@ -105,8 +134,45 @@ def tomo_step(config_dict):
     NOTE:
     see config_tomo_step for key inputs
     """
-    pass
+    _output = config_dict['output']
+    _samOutDist = config_dict['samOutDist']
 
+    # monitor shutter status, auto-puase scan if beam is lost
+    yield from bps.mv(A_shutter, 'open')
+    yield from bps.install_suspender(suspend_A_shutter)
+
+    # first front white field
+    current_samx = samx.position
+    yield from bps.mv(samx, current_samx + _samOutDist)
+    yield from collect_background(config_dict['n_white'], 
+                                  config_dict['n_frames'],
+                                  _output,
+                                )
+    yield from bps.mv(samx, current_samx)
+
+    # collect projections
+    angs =  np.arange(config_dict['omega_start'], 
+                      config_dict['omega_end'],
+                      config_dict['omega_step'],
+                    )
+    yield from step_scan(len(angs), config_dict['n_frames'], angs, _output)
+
+    # collect back white field
+    current_samx = samx.position
+    yield from bps.mv(samx, current_samx + _samOutDist)
+    yield from collect_background(config_dict['n_white'], 
+                                  config_dict['n_frames'],
+                                  _output,
+                                )
+    yield from bps.mv(samx, current_samx)
+
+    # collect back dark field
+    yield from bps.remove_suspender(suspend_A_shutter)
+    yield from bps.mv(A_shutter, "close")
+    yield from collect_background(config_dict['n_dark'], 
+                                  config_dict['n_frames'],
+                                  _output,
+                                )
 
 
 # ----
