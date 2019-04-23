@@ -52,6 +52,9 @@
     <Attribute name="HSlitsDSCenter"                type="EPICS_PV"     source="6bma:Slit2Hcenter.VAL"                      dbrtype="DBR_DOUBLE"/>
     <Attribute name="VSlitsDSSize"                  type="EPICS_PV"     source="6bma:Slit2Vsize.VAL"                        dbrtype="DBR_DOUBLE"/>
     <Attribute name="VSlitsDSCenter"                type="EPICS_PV"     source="6bma:Slit2Vcenter.VAL"                      dbrtype="DBR_DOUBLE"/>
+
+    <Attribute name="Preci"                         type="EPICS_PV"     source="6bmpreci:m1.VAL"                            dbrtype="DBR_DOUBLE"/>
+    
 <!-- 
     <Attribute name="DMM_USArm"                     type="EPICS_PV"     source="2bma:m30.RBV"                               dbrtype="DBR_DOUBLE"/>
     <Attribute name="DMM_DSArm"                     type="EPICS_PV"     source="2bma:m31.RBV"                               dbrtype="DBR_DOUBLE"/>
