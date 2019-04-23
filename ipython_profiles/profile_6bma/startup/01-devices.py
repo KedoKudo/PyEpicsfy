@@ -130,7 +130,7 @@ class PointGreyDetector6BM(SingleTrigger, AreaDetector):
             MyHDF5Plugin, 
             suffix="HDF1:",
             # root='/',                          # for databroker
-            # write_path_template=FILE_PATH,     # for EPICS AD
+            write_path_template=r"Y:\2019\startup_apr19\tomo\test",     # for EPICS AD
         )
 
 # Area Detector (AD) config block
