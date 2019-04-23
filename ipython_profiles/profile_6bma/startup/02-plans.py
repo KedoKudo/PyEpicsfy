@@ -29,7 +29,7 @@ def set_output_type(n_images, output='tiff'):
         for k,v in {
             "enable":      1,
             "num_capture": n_images,
-            "auto_increment": "Yes",
+            "auto_increment": "No",
             "capture":     1,
         }.items(): det.hdf1.stage_sigs[k] = v
         det.tiff1.stage_sigs["enable"] = 0
