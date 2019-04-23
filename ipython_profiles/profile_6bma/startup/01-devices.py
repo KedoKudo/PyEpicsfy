@@ -196,15 +196,15 @@ else:
 # separately in a HDF5 archive
 import epics
 # this is the PV we use as the `SaveDest` attribute
-epics.caput("1idPG2:cam1:FrameType.ZRST", "/dxchange/data_white_pre")
-epics.caput("1idPG2:cam1:FrameType.ONST", "/dxchange/data")
-epics.caput("1idPG2:cam1:FrameType.TWST", "/dxchange/data_white_post")
-epics.caput("1idPG2:cam1:FrameType.THST", "/dxchange/data_dark")
+epics.caput("1idPG2:cam1:FrameType.ZRST", "/exchange/data_white_pre")
+epics.caput("1idPG2:cam1:FrameType.ONST", "/exchange/data")
+epics.caput("1idPG2:cam1:FrameType.TWST", "/exchange/data_white_post")
+epics.caput("1idPG2:cam1:FrameType.THST", "/exchange/data_dark")
 
 # ophyd needs this configuration
-epics.caput("1idPG2:cam1:FrameType_RBV.ZRST", "/dxchange/data_white_pre")
-epics.caput("1idPG2:cam1:FrameType_RBV.ONST", "/dxchange/data")
-epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/dxchange/data_white_post")
-epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/dxchange/data_dark")
+epics.caput("1idPG2:cam1:FrameType_RBV.ZRST", "/exchange/data_white_pre")
+epics.caput("1idPG2:cam1:FrameType_RBV.ONST", "/exchange/data")
+epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_white_post")
+epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_dark")
 
 print(f"Done with {__file__}\n{_sep}\n")
