@@ -191,6 +191,10 @@ else:
     print("***--- config_hdf1")
     print("***before the acutal scan")
 
+det.tiff1.auto_increment.put(1)
+det.hdf1.auto_increment.put(1)
+
+
 # --
 # ref: 
 # we need to manually setup the PVs to store background and projections
