@@ -45,6 +45,7 @@ instrument_in_use = lambda : EpicsSignalRO("6bm:instrument_in_use",
                                 ).get()
 try:
     RE.md['INSTRUMENT_IN_USE'] = instrument_in_use()
+    offline_testmode = False
 except TimeoutError as e:
     print(f"---receving error: {e}---")
     print("---switching to offline test mode---")
