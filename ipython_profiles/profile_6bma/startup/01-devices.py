@@ -198,9 +198,9 @@ epics.caput("1idPG2:cam1:FrameType.TWST", "/dxchange/data_white_post")
 epics.caput("1idPG2:cam1:FrameType.THST", "/dxchange/data_dark")
 
 # ophyd needs this configuration
-epics.caput("13SIM1:cam1:FrameType_RBV.ZRST", "/dxchange/data_white_pre")
-epics.caput("13SIM1:cam1:FrameType_RBV.ONST", "/dxchange/data")
-epics.caput("13SIM1:cam1:FrameType_RBV.TWST", "/dxchange/data_white_post")
-epics.caput("13SIM1:cam1:FrameType_RBV.TWST", "/dxchange/data_dark")
+epics.caput("1idPG2:cam1:FrameType_RBV.ZRST", "/dxchange/data_white_pre")
+epics.caput("1idPG2:cam1:FrameType_RBV.ONST", "/dxchange/data")
+epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/dxchange/data_white_post")
+epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/dxchange/data_dark")
 
 print(f"Done with {__file__}\n{_sep}\n")
