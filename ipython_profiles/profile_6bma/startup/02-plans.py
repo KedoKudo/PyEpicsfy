@@ -113,7 +113,7 @@ config_tomo_step = {
     "n_white"        :  10,
     "n_dark"         :  10,
     "samOutDist"     : -5.00,           # mm
-    "omega_step"     :  0.25,           # degrees
+    "omega_step"     :  0.5,           # degrees
     "acquire_time"   :  0.05,           # sec
     # "acquire_period" :  0.05+0.01,      # sec
     # "time_wait"      : (0.05+0.01)*2,   # sec
