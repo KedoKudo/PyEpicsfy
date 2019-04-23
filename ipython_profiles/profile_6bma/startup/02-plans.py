@@ -28,7 +28,7 @@ def set_output_type(n_images, output='tiff'):
     elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
         for k,v in {
             "enable":      1,
-            "num_capture": n_images,
+            "num_capture": n_images+30,
             "auto_increment": "No",
             "capture":     1,
         }.items(): det.hdf1.stage_sigs[k] = v
