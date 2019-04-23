@@ -117,8 +117,8 @@ config_tomo_step = {
     "acquire_time"   :  0.05,           # sec
     # "acquire_period" :  0.05+0.01,      # sec
     # "time_wait"      : (0.05+0.01)*2,   # sec
-    "omega_start"    :  0,           # degrees
-    "omega_end"      :  10,            # degrees
+    "omega_start"    :  0,              # degrees
+    "omega_end"      :  5,              # degrees
     "n_frames"       :  5,              # proc.n_filters, cam.n_images
     "output"         : "tiff",          # output format ['tiff', 'hdf5']
 }
@@ -155,7 +155,7 @@ def tomo_step(config_dict):
     # collect projections
     yield from bps.mv(det.cam.frame_type, 1)
     angs =  np.arange(config_dict['omega_start'], 
-                      config_dict['omega_end'],
+                      config_dict['omega_end']+config_dict['omega_step']/2,
                       config_dict['omega_step'],
                     )
     yield from step_scan(n_images=len(angs), 
