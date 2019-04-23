@@ -77,7 +77,7 @@ ADPV_prefix = "1idPG2"   # AreaDetector prefix
 config_experiment = {
     "OUTPUT_ROOT" : "Y:\\",     # The control os is windows...
     "CYCLE" : "2019-1",
-    "EXPID" : "internal_apr19",
+    "EXPID" : "startup_apr19",
     "USER"  : "tomo",
     'SAMPLE' : "test",
 }
