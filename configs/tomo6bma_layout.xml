@@ -69,7 +69,7 @@
             <dataset name="sample_y" source="ndattribute" ndattribute="SampleY" when="OnFileClose"> 
               <attribute name="units" source="constant" value="mm" type="string" />
             </dataset>
-            <dataset name="sample_rotary" source="ndattribute" ndattribute="SampleRotary" when="OnFileClose"> 
+            <dataset name="sample_rotary" source="ndattribute" ndattribute="Preci" when="OnFileClose"> 
               <attribute name="units" source="constant" value="deg" type="string" />
             </dataset>
             <dataset name="sample_xx" source="ndattribute" ndattribute="SampleXX" when="OnFileClose"> 
