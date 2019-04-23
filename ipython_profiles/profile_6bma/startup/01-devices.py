@@ -186,4 +186,21 @@ else:
     print("***--- config_hdf1")
     print("***before the acutal scan")
 
+# --
+# ref: 
+# we need to manually setup the PVs to store background and projections
+# separately in a HDF5 archive
+import epics
+# this is the PV we use as the `SaveDest` attribute
+epics.caput("1idPG2:cam1:FrameType.ZRST", "/dxchange/data_white_pre")
+epics.caput("1idPG2:cam1:FrameType.ONST", "/dxchange/data")
+epics.caput("1idPG2:cam1:FrameType.TWST", "/dxchange/data_white_post")
+epics.caput("1idPG2:cam1:FrameType.THST", "/dxchange/data_dark")
+
+# ophyd needs this configuration
+epics.caput("13SIM1:cam1:FrameType_RBV.ZRST", "/dxchange/data_white_pre")
+epics.caput("13SIM1:cam1:FrameType_RBV.ONST", "/dxchange/data")
+epics.caput("13SIM1:cam1:FrameType_RBV.TWST", "/dxchange/data_white_post")
+epics.caput("13SIM1:cam1:FrameType_RBV.TWST", "/dxchange/data_dark")
+
 print(f"Done with {__file__}\n{_sep}\n")

@@ -144,6 +144,8 @@ def tomo_step(config_dict):
     # first front white field
     current_samx = samx.position
     yield from bps.mv(samx, current_samx + _samOutDist)
+    # ??
+    yield from bps.mv(det.cam.frame_type, "data_white_pre")
     yield from collect_background(config_dict['n_white'], 
                                   config_dict['n_frames'],
                                   _output,
@@ -151,6 +153,7 @@ def tomo_step(config_dict):
     yield from bps.mv(samx, current_samx)
 
     # collect projections
+    yield from bps.mv(det.cam.frame_type, "data")
     angs =  np.arange(config_dict['omega_start'], 
                       config_dict['omega_end'],
                       config_dict['omega_step'],
@@ -160,6 +163,7 @@ def tomo_step(config_dict):
     # collect back white field
     current_samx = samx.position
     yield from bps.mv(samx, current_samx + _samOutDist)
+    yield from bps.mv(det.cam.frame_type, "data_white_post")
     yield from collect_background(config_dict['n_white'], 
                                   config_dict['n_frames'],
                                   _output,
@@ -169,7 +173,8 @@ def tomo_step(config_dict):
     # collect back dark field
     yield from bps.remove_suspender(suspend_A_shutter)
     yield from bps.mv(A_shutter, "close")
-    yield from collect_background(config_dict['n_dark'], 
+    yield from bps.mv(det.cam.frame_type, "data_dark")
+    yield from collect_background(config_dict['n_dark'],
                                   config_dict['n_frames'],
                                   _output,
                                 )
