@@ -46,7 +46,7 @@ def collect_background(n_images,
                        output='tiff',
     ):
     """collect n_images backgrounds with n_frames per take"""
-    yield from bps.mv(det.cam.acquire, 0)
+    # yield from bps.mv(det.cam.acquire, 0)
 
     set_output_type(n_images, output)
     
