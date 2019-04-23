@@ -101,6 +101,16 @@ from ophyd import ProcessPlugin
 from ophyd import TIFFPlugin
 from ophyd import HDF5Plugin
 from ophyd import sim
+from ophyd.areadetector.filestore_mixins import FileStoreHDF5IterativeWrite
+
+class MyHDF5Plugin(HDF5Plugin, FileStoreHDF5IterativeWrite):
+    #file_path = ADComponent(EpicsSignalWithRBV, "FilePath")
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filestore_spec = "AD_HDF5_DX_V1"
+        # DataExchangeAreaDetectorHDF5Handler
+
 
 class PointGreyDetector6BM(SingleTrigger, AreaDetector):
     """Point Gray area detector used at 6BM"""
@@ -117,10 +127,10 @@ class PointGreyDetector6BM(SingleTrigger, AreaDetector):
         )
 
     hdf1 = ADComponent(
-            HDF5Plugin, 
+            MyHDF5Plugin, 
             suffix="HDF1:",
-            # root='/',                          # for databroker
-            # write_path_template=FILE_PATH,     # for EPICS AD
+            root='/',                          # for databroker
+            write_path_template=FILE_PATH,     # for EPICS AD
         )
 
 # Area Detector (AD) config block
