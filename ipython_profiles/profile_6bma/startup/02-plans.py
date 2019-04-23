@@ -77,7 +77,7 @@ def step_scan(n_images,
               output='tiff',
     ):
     """collect proejctions by stepping motors"""
-    set_output_type(output)
+    set_output_type(n_images, output)
 
     for k, v in {
         "enable":           1,         # toggle on proc1
