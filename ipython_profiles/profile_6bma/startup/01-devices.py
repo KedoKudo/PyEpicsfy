@@ -156,6 +156,7 @@ config_hdf1 = {
     "enable":          0,           # disable by default
     "nd_array_port":  "PROC1",      # switch port for TIFF plugin
     "auto_save":      "Yes",
+    "auto_increment": "Yes",
     "file_write_mode":  "Capture",     # change write mode
     "file_template":    r"%s%s_%06d.hd5",
     "file_path":      FILE_PATH,    # set file path
