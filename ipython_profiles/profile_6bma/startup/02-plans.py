@@ -182,7 +182,7 @@ def tomo_step(config_dict):
 
 # ----
 # Fly scan bundle example
-config_tomo_step = {
+config_tomo_fly = {
     "n_white"        :  10,
     "n_dark"         :  10,
 }
