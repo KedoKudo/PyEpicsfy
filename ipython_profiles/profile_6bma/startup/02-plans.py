@@ -115,8 +115,8 @@ config_tomo_step = {
     "samOutDist"     : -5.00,           # mm
     "omega_step"     :  0.25,           # degrees
     "acquire_time"   :  0.05,           # sec
-    "acquire_period" :  0.05+0.01,      # sec
-    "time_wait"      : (0.05+0.01)*2,   # sec
+    # "acquire_period" :  0.05+0.01,      # sec
+    # "time_wait"      : (0.05+0.01)*2,   # sec
     "omega_start"    :  -180,           # degrees
     "omega_end"      :  180,            # degrees
     "n_frames"       :  5,              # proc.n_filters, cam.n_images

@@ -131,7 +131,7 @@ config_cam = {
     "image_mode":     "Multiple",  #
     "trigger_mode":   "Internal",  #
     "acquire_time":   0.05,        # exposure time (fExposureTime)
-    "acquire_period": 0.05+0.01,   #
+    # "acquire_period": 0.05+0.01,   #
     "gain":           5,           # detector gain [0~30]
 }
 
