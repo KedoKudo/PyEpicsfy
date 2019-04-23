@@ -146,6 +146,7 @@ config_tiff1 = {
     "enable":           0,            # disable by default
     "nd_array_port":    "PROC1",      # switch port for TIFF plugin
     "file_write_mode":  "Capture",     # change write mode
+    "auto_increment": "Yes",
     "auto_save":        "Yes",        # turn on file save
     "file_template":    r"%s%s_%06d.tiff",
     "file_path":        FILE_PATH,    # set file path
