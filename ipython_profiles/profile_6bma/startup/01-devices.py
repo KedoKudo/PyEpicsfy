@@ -157,7 +157,7 @@ config_hdf1 = {
     "nd_array_port":  "PROC1",      # switch port for TIFF plugin
     "auto_save":      "Yes",
     "file_write_mode":  "Capture",     # change write mode
-    "file_template":    r"%s%s_%06d.tiff",
+    "file_template":    r"%s%s_%06d.hd5",
     "file_path":      FILE_PATH,    # set file path
     "file_name":      FILE_PREFIX,  # img name prefix
 }
