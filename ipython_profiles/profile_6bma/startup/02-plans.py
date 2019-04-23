@@ -57,7 +57,7 @@ def collect_background(n_images,
     for k,v in {
         "trigger_mode": "Internal",
         "image_mode":   "Multiple",
-        "num_images":   n_frames,
+        "num_images":   n_frames*n_images,
     }.items(): det.cam.stage_sigs[k] = v
 
     @bpp.stage_decorator([det])
