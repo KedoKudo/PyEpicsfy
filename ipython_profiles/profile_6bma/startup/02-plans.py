@@ -6,7 +6,7 @@ import numpy                 as np
 import bluesky.plans         as bp
 import bluesky.preprocessors as bpp
 import bluesky.plan_stubs    as bps
-
+from bluesky.simulators import summarize_plan
 
 def set_output_type(n_images, output='tiff'):
     """config output"""
