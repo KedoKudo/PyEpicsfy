@@ -145,8 +145,9 @@ config_proc1 = {
 config_tiff1 = {
     "enable":           0,            # disable by default
     "nd_array_port":    "PROC1",      # switch port for TIFF plugin
-    "file_write_mode":  "Stream",     # change write mode
+    "file_write_mode":  "Capture",     # change write mode
     "auto_save":        "Yes",        # turn on file save
+    "file_template":    r"%s%s_%06d.tiff",
     "file_path":        FILE_PATH,    # set file path
     "file_name":        FILE_PREFIX,  # img name prefix
 }
@@ -155,6 +156,8 @@ config_hdf1 = {
     "enable":          0,           # disable by default
     "nd_array_port":  "PROC1",      # switch port for TIFF plugin
     "auto_save":      "Yes",
+    "file_write_mode":  "Capture",     # change write mode
+    "file_template":    r"%s%s_%06d.tiff",
     "file_path":      FILE_PATH,    # set file path
     "file_name":      FILE_PREFIX,  # img name prefix
 }
