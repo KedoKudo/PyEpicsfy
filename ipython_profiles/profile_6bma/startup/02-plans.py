@@ -29,6 +29,7 @@ def set_output_type(n_images, output='tiff'):
         for k,v in {
             "enable":      1,
             "num_capture": n_images,
+            "auto_increment": "Yes",
             "capture":     1,
         }.items(): det.hdf1.stage_sigs[k] = v
         det.tiff1.stage_sigs["enable"] = 0
@@ -119,7 +120,7 @@ config_tomo_step = {
     "omega_start"    :  0,              # degrees
     "omega_end"      :  5,              # degrees
     "n_frames"       :  5,              # proc.n_filters, cam.n_images
-    "output"         : "tiff",          # output format ['tiff', 'hdf5']
+    "output"         : "hdf5",          # output format ['tiff', 'hdf5']
 }
 def tomo_step(config_dict):
     """
