@@ -158,7 +158,11 @@ def tomo_step(config_dict):
                       config_dict['omega_end'],
                       config_dict['omega_step'],
                     )
-    yield from step_scan(len(angs), config_dict['n_frames'], angs, _output)
+    yield from step_scan(n_images=len(angs), 
+                         n_frames=config_dict['n_frames'],
+                         angs=angs,           # list of angles where images are taken
+                         output=_output,
+                    )
 
     # collect back white field
     current_samx = samx.position
