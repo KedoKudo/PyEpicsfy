@@ -2,194 +2,172 @@
 _sep = u"🙊"*30
 print(f'{_sep}\nCaching pre-defined scan plans with {__file__}')
 
+
 import numpy                 as np
 import bluesky.plans         as bp
 import bluesky.preprocessors as bpp
 import bluesky.plan_stubs    as bps
 from bluesky.simulators import summarize_plan
 
-def set_output_type(n_images, output='tiff'):
-    """config output"""
-    # clear the watch list first
-    # NOTE:
-    #    det.read_attrs is treated as a gloal var, therefore the chnages
-    #    made here affect the global workspace
-    det.read_attrs = [me for me in det.read_attrs 
-                        if me not in ('tiff1', 'hdf1')
-                    ]
-    if output.lower() in ['tif', 'tiff']:
-        for k,v in {
-            "enable":      1,
-            "num_capture": n_images,
-            "capture":     1,
-        }.items(): det.tiff1.stage_sigs[k] = v
-        det.hdf1.stage_sigs["enable"] = 0
-        det.read_attrs.append('tiff1')
-    elif output.lower() in ['hdf', 'hdf1', 'hdf5']:
-        for k,v in {
-            "enable":      1,
-            "num_capture": n_images,
-            "auto_increment": "No",
-            "capture":     1,
-        }.items(): det.hdf1.stage_sigs[k] = v
-        det.tiff1.stage_sigs["enable"] = 0
-        det.read_attrs.append('hdf1')
+
+def config_output(output_dict, nimages):
+    """config output based on given configuration dict"""
+    fp = FILE_PATH if output_dict['file_path'] is None else output_dict['file_path']
+    fn = FILE_PREFIX if output_dict['file_name'] is None else output_dict['file_name']
+    
+    if output_dict['type'].lower() in ['tif', 'tiff']:
+        _plg_on = det.tiff1
+        _plg_off = det.hdf1
+    elif output_dict['type'].lower() in ['hdf', 'hdf1', 'hdf5']:
+        _plg_on = det.hdf1
+        _plg_off = det.tiff1
     else:
-        raise ValueError(f"Unknown output format {output}")
-
-
-# ----
-# Dark/White flat field
-# NOTE:
-#    det is a global var that refers to the detector
-def collect_background(n_images, 
-                       n_frames,
-                       output='tiff',
-    ):
-    """collect n_images backgrounds with n_frames per take"""
-
-    set_output_type(n_images, output)
+        raise ValueError(f"Unsupported output type {output_dict['type']}")
     
-    for k,v in {
-        "reset_filter":     1,
-        "num_filter":       n_frames,
-    }.items(): det.proc1.stage_sigs[k] = v
+    for k, v in {
+        "enable":         1,
+        "num_capture":    nimages,
+        "file_template":  r"%s%s_%06d.tiff",
+        "file_path":      fp,    
+        "file_name":      fn,
+        "capture":        1,
+    }.items(): _plg_on.stage_sigs[k] = v
+    _plg_off.stage_sigs['enable'] = 0
+
+    # disable HDF5 auto_increment so that we have a single archive
+    # NOTE:
+    # Might not be necessary with current setup where the HDF5 remain open
+    # the whole scan...
+    det.hdf1.stage_sigs['auto_increment'] = "No"
+
+
+def tomo_step(config):
+    """read the config file or dict to formulate a step scan plan"""
+    config = load_config(config) if type(config) != dict else config
+
+    # step_0: extrat scan related vars
+    acquire_time = config['tomo']['acquire_time']
+    acquire_period = config['tomo']['acquire_period']
+    n_frames = config['tomo']['n_frames']
+    n_white = config['tomo']['n_white']
+    n_dark = config['tomo']['n_dark']
+    angs = np.arange(
+        config_dict['omega_start'], 
+        config_dict['omega_end']+config_dict['omega_step']/2,
+        config_dict['omega_step'],
+    )
+    n_projections = len(angs)
+    total_images  = n_white + n_projections + n_white + n_dark
+    
+    # step_1: setup output configuration
+    config_output(config['output'], total_images)
+
+    # step_2: the whole scan
+    # NOTE:
+    # 1. As of 04/24/2019, the area detector HDF5 plugin does not support
+    # appending dataset to existing HDF5 archives.  Therefore, we need
+    # to write everything at once to get single archive file...
+    # 2. BlueSky use the generator feature to realize delayed execution,
+    # so we need to define all the scan related actions in an closure, also
+    # known as the inline/nested function.
+    @bpp.stage_decorator([det])
+    @bpp.run_decorator()
+    def scan_closer():
+        yield from bps.mv(det.cam.acquire_time, acquire_time)
+        yield from bps.mv(det.cam.acquire_period, acquire_period)
         
-    for k,v in {
-        "trigger_mode": "Internal",
-        "image_mode":   "Multiple",
-        "num_images":   n_frames*n_images,
-    }.items(): det.cam.stage_sigs[k] = v
+        # -------------------
+        # collect white field
+        # -------------------
+        # 1-1 monitor shutter status, auto-puase scan if beam is lost
+        yield from bps.mv(A_shutter, 'open')
+        yield from bps.install_suspender(suspend_A_shutter)
 
-    @bpp.stage_decorator([det])
-    @bpp.run_decorator()
-    def scan():
-        yield from bps.trigger_and_read([det]) 
-    
-    return (yield from scan())
+        # 1-2 move sample out of the way
+        current_samx = samx.position
+        current_samy = samy.position
+        current_preci = preci.position
+        dx = config['tomo']['sample_out_position']['samx']
+        dy = config['tomo']['sample_out_position']['samy']
+        dr = config['tomo']['sample_out_position']['preci']
+        yield from bps.mv(samx,  current_samx  + dx)
+        yield from bps.mv(samy,  current_samy  + dy)
+        yield from bps.mv(preci, current_preci + dr)
 
+        # 1-2.5 set frame type for an organized HDF5 archive
+        yield from bps.mv(det.cam.frame_type, 0)
 
-# ----
-# Projections (step)
-def step_scan(n_images, 
-              n_frames,
-              angs,           # list of angles where images are taken
-              output='tiff',
-    ):
-    """collect proejctions by stepping motors"""
-    set_output_type(n_images, output)
+        # 1-3 collect front white field images
+        yield from bps.mv(det.proc1.enable, 1)
+        yield from bps.mv(det.proc1.reset_filter, 1)
+        yield from bps.mv(det.proc1.num_filter, n_frames)
+        yield from bps.mv(det.cam.trigger_mode, "Internal")
+        yield from bps.mv(det.cam.image_mode, "Multiple")
+        yield from bps.mv(det.cam.num_images, n_frames*n_white)
+        yield from bps.trigger_and_read([det])
 
-    for k, v in {
-        "enable":           1,         # toggle on proc1
-        "reset_filter":     1,         # reset number_filtered
-        "num_filter":       n_frames,
-    }.items(): det.proc1.stage_sigs[k] = v
-    
-    for k, v in {
-        "num_images":   n_frames,      
-    }.items(): det.cam.stage_sigs[k] = v
+        # 1-4 move sample back
+        yield from bps.mv(samx,  current_samx )
+        yield from bps.mv(samy,  current_samy )
+        yield from bps.mv(preci, current_preci)
 
-    @bpp.stage_decorator([det])
-    @bpp.run_decorator()
-    def scan_closure():
+        # -------------------
+        # collect projections
+        # -------------------
+        # 1-4.5 set frame type for an organized HDF5 archive
+        yield from bps.mv(det.cam.frame_type, 1)
+
+        # 1-5 quicly reset proc1
+        yield from bps.mv(det.proc1.reset_filter, 1)
+        yield from bps.mv(det.cam.num_images, n_frames)
+
+        # 1-6 collect projections
         for ang in angs:
             yield from bps.checkpoint()
             yield from bps.mv(preci, ang)
             yield from bps.trigger_and_read([det])
-    
+
+        # ------------------
+        # collect back white
+        # ------------------
+        # 1-7 move the sample out of the way
+        # NOTE:
+        # this will return ALL motors to starting positions, we need a
+        # smart way to calculate a shorter trajectory to move sample
+        # out of way
+        yield from bps.mv(preci, current_preci + dr)
+        yield from bps.mv(samx,  current_samx  + dx)
+        yield from bps.mv(samy,  current_samy  + dy)
+        
+        # 1-7.5 set frame type for an organized HDF5 archive
+        yield from bps.mv(det.cam.frame_type, 2)
+
+        # 1-8 take the back white
+        yield from bps.mv(det.cam.num_images, n_frames*n_white)
+        yield from bps.trigger_and_read([det])
+
+        # 1-9 move sample back
+        yield from bps.mv(samx,  current_samx )
+        yield from bps.mv(samy,  current_samy )
+        yield from bps.mv(preci, current_preci)
+
+        # -----------------
+        # collect back dark
+        # -----------------
+        # 1-10 close the shutter
+        yield from bps.remove_suspender(suspend_A_shutter)
+        yield from bps.mv(A_shutter, "close")
+
+        # 1-10.5 set frame type for an organized HDF5 archive
+        yield from bps.mv(det.cam.frame_type, 3)
+
+        # 1-11 collect the back dark
+        yield from bps.mv(det.cam.num_images, n_frames*n_dark)
+        yield from bps.trigger_and_read([det])
+        
     return (yield from scan_closure())
 
 
-# ----
-# Projections (fly)
-def fly_scan():
-    """collect projections using fly scan feature"""
-    pass
-
-
-# ----
-# Example bundled tomo characterization scan
-config_tomo_step = {
-    "n_white"        :  10,
-    "n_dark"         :  10,
-    "samOutDist"     : -5.00,           # mm
-    "omega_step"     :  0.5,           # degrees
-    "acquire_time"   :  0.05,           # sec
-    # "acquire_period" :  0.05+0.01,      # sec
-    # "time_wait"      : (0.05+0.01)*2,   # sec
-    "omega_start"    :  0,              # degrees
-    "omega_end"      :  5,              # degrees
-    "n_frames"       :  5,              # proc.n_filters, cam.n_images
-    "output"         : "hdf5",          # output format ['tiff', 'hdf5']
-}
-def tomo_step(config_dict):
-    """
-    The master plan pass to RE for
-    
-    1. pre-white-field background collection
-    2. projection collection
-    3. post-white-field background collection
-    4. post-dark-field background collection
-
-    NOTE:
-    see config_tomo_step for key inputs
-    """
-    _output = config_dict['output']
-    _samOutDist = config_dict['samOutDist']
-
-    # monitor shutter status, auto-puase scan if beam is lost
-    yield from bps.mv(A_shutter, 'open')
-    yield from bps.install_suspender(suspend_A_shutter)
-
-    # first front white field
-    current_samx = samx.position
-    yield from bps.mv(samx, current_samx + _samOutDist)
-    # ??
-    yield from bps.mv(det.cam.frame_type, 0)
-    yield from collect_background(config_dict['n_white'], 
-                                  config_dict['n_frames'],
-                                  _output,
-                                )
-    yield from bps.mv(samx, current_samx)
-
-    # collect projections
-    yield from bps.mv(det.cam.frame_type, 1)
-    angs =  np.arange(config_dict['omega_start'], 
-                      config_dict['omega_end']+config_dict['omega_step']/2,
-                      config_dict['omega_step'],
-                    )
-    yield from step_scan(n_images=len(angs), 
-                         n_frames=config_dict['n_frames'],
-                         angs=angs,           # list of angles where images are taken
-                         output=_output,
-                    )
-
-    # collect back white field
-    current_samx = samx.position
-    yield from bps.mv(samx, current_samx + _samOutDist)
-    yield from bps.mv(det.cam.frame_type, 2)
-    yield from collect_background(config_dict['n_white'], 
-                                  config_dict['n_frames'],
-                                  _output,
-                                )
-    yield from bps.mv(samx, current_samx)
-
-    # collect back dark field
-    yield from bps.remove_suspender(suspend_A_shutter)
-    yield from bps.mv(A_shutter, "close")
-    yield from bps.mv(det.cam.frame_type, 3)
-    yield from collect_background(config_dict['n_dark'],
-                                  config_dict['n_frames'],
-                                  _output,
-                                )
-
-
-# ----
-# Fly scan bundle example
-config_tomo_fly = {
-    "n_white"        :  10,
-    "n_dark"         :  10,
-}
 def tomo_fly(config_dict):
     """
     The master plan pass to RE for
