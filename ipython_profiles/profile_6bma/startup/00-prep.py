@@ -72,4 +72,15 @@ else:
 # testing mode, supercede in_production
 in_dryrun = True
 
+
+# -----
+# utility functions
+import yaml
+def load_config(yamlfile):
+    """load yaml to a dict"""
+    with open(yamlfile, 'r') as stream:
+        _dict = yaml.safe_load(stream)
+    return _dict
+
+
 print(f"Done with {__file__}\n{_sep}\n")
