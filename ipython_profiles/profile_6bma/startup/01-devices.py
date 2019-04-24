@@ -101,15 +101,6 @@ from ophyd import ProcessPlugin
 from ophyd import TIFFPlugin
 from ophyd import HDF5Plugin
 from ophyd import sim
-from ophyd.areadetector.filestore_mixins import FileStoreHDF5IterativeWrite
-
-class MyHDF5Plugin(HDF5Plugin, FileStoreHDF5IterativeWrite):
-    #file_path = ADComponent(EpicsSignalWithRBV, "FilePath")
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.filestore_spec = "AD_HDF5_DX_V1"
-        # DataExchangeAreaDetectorHDF5Handler
 
 
 class PointGreyDetector6BM(SingleTrigger, AreaDetector):
@@ -127,10 +118,8 @@ class PointGreyDetector6BM(SingleTrigger, AreaDetector):
         )
 
     hdf1 = ADComponent(
-            MyHDF5Plugin, 
+            HDF5Plugin, 
             suffix="HDF1:",
-            root='Y:',                          # for databroker
-            write_path_template=r"Y:\\2019-1\\startup_apr19\\tomo\\test\\",     # for EPICS AD
         )
 
 # Area Detector (AD) config block
@@ -156,7 +145,7 @@ config_tiff1 = {
     "enable":           0,            # disable by default
     "nd_array_port":    "PROC1",      # switch port for TIFF plugin
     "file_write_mode":  "Capture",     # change write mode
-    "auto_increment": "Yes",
+    "auto_increment":   "Yes",
     "auto_save":        "Yes",        # turn on file save
     "file_template":    r"%s%s_%06d.tiff",
     "file_path":        FILE_PATH,    # set file path
@@ -201,25 +190,25 @@ else:
     print("***--- config_hdf1")
     print("***before the acutal scan")
 
-det.tiff1.auto_increment.put(1)
-det.hdf1.auto_increment.put(1)
-
 
 # --
 # ref: 
 # we need to manually setup the PVs to store background and projections
 # separately in a HDF5 archive
-import epics
-# this is the PV we use as the `SaveDest` attribute
-epics.caput("1idPG2:cam1:FrameType.ZRST", "/exchange/data_white_pre")
-epics.caput("1idPG2:cam1:FrameType.ONST", "/exchange/data")
-epics.caput("1idPG2:cam1:FrameType.TWST", "/exchange/data_white_post")
-epics.caput("1idPG2:cam1:FrameType.THST", "/exchange/data_dark")
+if offline_testmode:
+    pass
+else:
+    import epics
+    # this is the PV we use as the `SaveDest` attribute
+    epics.caput("1idPG2:cam1:FrameType.ZRST", "/exchange/data_white_pre")
+    epics.caput("1idPG2:cam1:FrameType.ONST", "/exchange/data")
+    epics.caput("1idPG2:cam1:FrameType.TWST", "/exchange/data_white_post")
+    epics.caput("1idPG2:cam1:FrameType.THST", "/exchange/data_dark")
 
-# ophyd needs this configuration
-epics.caput("1idPG2:cam1:FrameType_RBV.ZRST", "/exchange/data_white_pre")
-epics.caput("1idPG2:cam1:FrameType_RBV.ONST", "/exchange/data")
-epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_white_post")
-epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_dark")
+    # ophyd needs this configuration
+    epics.caput("1idPG2:cam1:FrameType_RBV.ZRST", "/exchange/data_white_pre")
+    epics.caput("1idPG2:cam1:FrameType_RBV.ONST", "/exchange/data")
+    epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_white_post")
+    epics.caput("1idPG2:cam1:FrameType_RBV.TWST", "/exchange/data_dark")
 
 print(f"Done with {__file__}\n{_sep}\n")
