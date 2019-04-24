@@ -52,9 +52,9 @@ def tomo_step(config):
     n_white = config['tomo']['n_white']
     n_dark = config['tomo']['n_dark']
     angs = np.arange(
-        config_dict['omega_start'], 
-        config_dict['omega_end']+config_dict['omega_step']/2,
-        config_dict['omega_step'],
+        config['omega_start'], 
+        config['omega_end']+config_dict['omega_step']/2,
+        config['omega_step'],
     )
     n_projections = len(angs)
     total_images  = n_white + n_projections + n_white + n_dark
