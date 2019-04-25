@@ -12,8 +12,8 @@ from bluesky.simulators import summarize_plan
 
 def config_output(output_dict, nimages):
     """config output based on given configuration dict"""
-    fp = FILE_PATH if output_dict['file_path'] is None else output_dict['file_path']
-    fn = FILE_PREFIX if output_dict['file_name'] is None else output_dict['file_name']
+    fp = FILE_PATH if output_dict['filepath'] is None else output_dict['filepath']
+    fn = FILE_PREFIX if output_dict['filename'] is None else output_dict['filename']
     
     if output_dict['type'].lower() in ['tif', 'tiff']:
         _plg_on = det.tiff1
