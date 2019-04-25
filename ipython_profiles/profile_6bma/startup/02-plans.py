@@ -72,7 +72,7 @@ def tomo_step(config):
     # known as the inline/nested function.
     @bpp.stage_decorator([det])
     @bpp.run_decorator()
-    def scan_closer():
+    def scan_closure():
         yield from bps.mv(det.cam.acquire_time, acquire_time)
         yield from bps.mv(det.cam.acquire_period, acquire_period)
         
