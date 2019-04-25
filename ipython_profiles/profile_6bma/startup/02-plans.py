@@ -38,7 +38,7 @@ def config_output(output_dict, nimages):
     # NOTE:
     # Might not be necessary with current setup where the HDF5 remain open
     # the whole scan...
-    det.hdf1.stage_sigs['auto_increment'] = "No"
+    # det.hdf1.stage_sigs['auto_increment'] = "No"
 
 
 def tomo_step(config):
