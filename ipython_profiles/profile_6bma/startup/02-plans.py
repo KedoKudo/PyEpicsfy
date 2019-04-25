@@ -27,7 +27,7 @@ def config_output(output_dict, nimages):
     for k, v in {
         "enable":         1,
         "num_capture":    nimages,
-        "file_template":  r"%s%s_%06d.tiff",
+        "file_template":  ".".join([r"%s%s_%06d",output_dict['type'].lower()]),
         "file_path":      fp,    
         "file_name":      fn,
         "capture":        1,
