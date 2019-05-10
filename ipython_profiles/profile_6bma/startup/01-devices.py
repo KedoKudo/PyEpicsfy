@@ -72,7 +72,7 @@ from pathlib import Path, PureWindowsPath
 
 print("\nSetting up area detector")
 # production control ENV vars
-ADPV_prefix = "1idPG2"   # AreaDetector prefix
+ADPV_prefix = "1idPG3"   # AreaDetector prefix
 
 config_experiment = {
     "OUTPUT_ROOT" : "Y:\\",     # The control os is windows...
